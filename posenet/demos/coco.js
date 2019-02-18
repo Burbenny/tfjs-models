@@ -58,7 +58,7 @@ const images = [
   'two_on_bench.jpg',
 ];
 
-const {partIds, poseChain} = posenet;
+const { partIds, poseChain } = posenet;
 
 /**
  * Draws a pose if it passes a minimum confidence onto a canvas.
@@ -70,12 +70,12 @@ function drawResults(canvas, poses, minPartConfidence, minPoseConfidence) {
     if (pose.score >= minPoseConfidence) {
       if (guiState.showKeypoints) {
         drawKeypoints(
-            pose.keypoints, minPartConfidence, canvas.getContext('2d'));
+          pose.keypoints, minPartConfidence, canvas.getContext('2d'));
       }
 
       if (guiState.showSkeleton) {
         drawSkeleton(
-            pose.keypoints, minPartConfidence, canvas.getContext('2d'));
+          pose.keypoints, minPartConfidence, canvas.getContext('2d'));
       }
 
       if (guiState.showBoundingBox) {
@@ -86,7 +86,7 @@ function drawResults(canvas, poses, minPartConfidence, minPoseConfidence) {
 }
 
 const imageBucket =
-    'https://storage.googleapis.com/tfjs-models/assets/posenet/';
+  'https://storage.googleapis.com/tfjs-models/assets/posenet/';
 
 async function loadImage(imagePath) {
   const image = new Image();
@@ -115,17 +115,17 @@ function multiPersonCanvas() {
 function drawSinglePoseResults(pose) {
   const canvas = singlePersonCanvas();
   drawResults(
-      canvas, [pose], guiState.singlePoseDetection.minPartConfidence,
-      guiState.singlePoseDetection.minPoseConfidence);
+    canvas, [pose], guiState.singlePoseDetection.minPartConfidence,
+    guiState.singlePoseDetection.minPoseConfidence);
 
-  const {part, showHeatmap, showOffsets} = guiState.visualizeOutputs;
+  const { part, showHeatmap, showOffsets } = guiState.visualizeOutputs;
   // displacements not used for single pose decoding
   const showDisplacements = false;
   const partId = +part;
 
   visualizeOutputs(
-      partId, showHeatmap, showOffsets, showDisplacements,
-      canvas.getContext('2d'));
+    partId, showHeatmap, showOffsets, showDisplacements,
+    canvas.getContext('2d'));
 }
 
 /**
@@ -134,16 +134,16 @@ function drawSinglePoseResults(pose) {
 function drawMultiplePosesResults(poses) {
   const canvas = multiPersonCanvas();
   drawResults(
-      canvas, poses, guiState.multiPoseDetection.minPartConfidence,
-      guiState.multiPoseDetection.minPoseConfidence);
+    canvas, poses, guiState.multiPoseDetection.minPartConfidence,
+    guiState.multiPoseDetection.minPoseConfidence);
 
-  const {part, showHeatmap, showOffsets, showDisplacements} =
-      guiState.visualizeOutputs;
+  const { part, showHeatmap, showOffsets, showDisplacements } =
+    guiState.visualizeOutputs;
   const partId = +part;
 
   visualizeOutputs(
-      partId, showHeatmap, showOffsets, showDisplacements,
-      canvas.getContext('2d'));
+    partId, showHeatmap, showOffsets, showDisplacements,
+    canvas.getContext('2d'));
 }
 
 /**
@@ -152,51 +152,51 @@ function drawMultiplePosesResults(poses) {
  *the nose as the root of the tree.
  **/
 const parentChildrenTuples = poseChain.map(
-    ([parentJoinName, childJoinName]) =>
-        ([partIds[parentJoinName], partIds[childJoinName]]));
+  ([parentJoinName, childJoinName]) =>
+    ([partIds[parentJoinName], partIds[childJoinName]]));
 
 /**
  * Parent to child edges from the skeleton indexed by part id.  Indexes the edge
  * ids by the part ids.
  */
 const parentToChildEdges =
-    parentChildrenTuples.reduce((result, [partId], i) => {
-      if (result[partId]) {
-        result[partId] = [...result[partId], i];
-      } else {
-        result[partId] = [i];
-      }
+  parentChildrenTuples.reduce((result, [partId], i) => {
+    if (result[partId]) {
+      result[partId] = [...result[partId], i];
+    } else {
+      result[partId] = [i];
+    }
 
-      return result;
-    }, {});
+    return result;
+  }, {});
 
 /**
  * Child to parent edges from the skeleton indexed by part id.  Indexes the edge
  * ids by the part ids.
  */
 const childToParentEdges =
-    parentChildrenTuples.reduce((result, [, partId], i) => {
-      if (result[partId]) {
-        result[partId] = [...result[partId], i];
-      } else {
-        result[partId] = [i];
-      }
+  parentChildrenTuples.reduce((result, [, partId], i) => {
+    if (result[partId]) {
+      result[partId] = [...result[partId], i];
+    } else {
+      result[partId] = [i];
+    }
 
-      return result;
-    }, {});
+    return result;
+  }, {});
 
 
 function drawOffsetVector(
-    ctx, y, x, outputStride, offsetsVectorY, offsetsVectorX) {
+  ctx, y, x, outputStride, offsetsVectorY, offsetsVectorX) {
   drawSegment(
-      [y * outputStride, x * outputStride],
-      [y * outputStride + offsetsVectorY, x * outputStride + offsetsVectorX],
-      'red', 1., ctx);
+    [y * outputStride, x * outputStride],
+    [y * outputStride + offsetsVectorY, x * outputStride + offsetsVectorX],
+    'red', 1., ctx);
 }
 
 function drawDisplacementEdgesFrom(
-    ctx, partId, displacements, outputStride, edges, y, x, offsetsVectorY,
-    offsetsVectorX) {
+  ctx, partId, displacements, outputStride, edges, y, x, offsetsVectorY,
+  offsetsVectorX) {
   const numEdges = displacements.shape[2] / 2;
 
   const offsetX = x * outputStride + offsetsVectorX;
@@ -210,8 +210,8 @@ function drawDisplacementEdgesFrom(
       const displacementX = displacements.get(y, x, edgeId + numEdges);
 
       drawSegment(
-          [offsetY, offsetX],
-          [offsetY + displacementY, offsetX + displacementX], 'blue', 1., ctx);
+        [offsetY, offsetX],
+        [offsetY + displacementY, offsetX + displacementX], 'blue', 1., ctx);
     });
   }
 }
@@ -224,9 +224,9 @@ function drawDisplacementEdgesFrom(
  *
  */
 function visualizeOutputs(
-    partId, drawHeatmaps, drawOffsetVectors, drawDisplacements, ctx) {
-  const {heatmapScores, offsets, displacementFwd, displacementBwd} =
-      modelOutputs;
+  partId, drawHeatmaps, drawOffsetVectors, drawDisplacements, ctx) {
+  const { heatmapScores, offsets, displacementFwd, displacementBwd } =
+    modelOutputs;
   const outputStride = +guiState.outputStride;
 
   const [height, width] = heatmapScores.shape;
@@ -251,7 +251,7 @@ function visualizeOutputs(
 
       if (drawOffsetVectors) {
         drawOffsetVector(
-            ctx, y, x, outputStride, offsetsVectorY, offsetsVectorX);
+          ctx, y, x, outputStride, offsetsVectorY, offsetsVectorX);
       }
 
       if (drawDisplacements) {
@@ -259,12 +259,12 @@ function visualizeOutputs(
         ctx.globalAlpha *= score;
 
         drawDisplacementEdgesFrom(
-            ctx, partId, displacementFwd, outputStride, parentToChildEdges, y,
-            x, offsetsVectorY, offsetsVectorX);
+          ctx, partId, displacementFwd, outputStride, parentToChildEdges, y,
+          x, offsetsVectorY, offsetsVectorX);
 
         drawDisplacementEdgesFrom(
-            ctx, partId, displacementBwd, outputStride, childToParentEdges, y,
-            x, offsetsVectorY, offsetsVectorX);
+          ctx, partId, displacementBwd, outputStride, childToParentEdges, y,
+          x, offsetsVectorY, offsetsVectorX);
       }
     }
 
@@ -281,7 +281,7 @@ async function decodeSinglePoseAndDrawResults() {
   }
 
   const pose = await posenet.decodeSinglePose(
-      modelOutputs.heatmapScores, modelOutputs.offsets, guiState.outputStride);
+    modelOutputs.heatmapScores, modelOutputs.offsets, guiState.outputStride);
 
   drawSinglePoseResults(pose);
 }
@@ -295,10 +295,10 @@ async function decodeMultiplePosesAndDrawResults() {
   }
 
   const poses = await posenet.decodeMultiplePoses(
-      modelOutputs.heatmapScores, modelOutputs.offsets,
-      modelOutputs.displacementFwd, modelOutputs.displacementBwd,
-      guiState.outputStride, guiState.multiPoseDetection.maxDetections,
-      guiState.multiPoseDetection);
+    modelOutputs.heatmapScores, modelOutputs.offsets,
+    modelOutputs.displacementFwd, modelOutputs.displacementBwd,
+    guiState.outputStride, guiState.multiPoseDetection.maxDetections,
+    guiState.multiPoseDetection);
 
   drawMultiplePosesResults(poses);
 }
@@ -390,6 +390,7 @@ function setupGui(net) {
       showDisplacements: false,
     },
   };
+
 
   const gui = new dat.GUI();
   // Output stride:  Internally, this parameter affects the height and width of
